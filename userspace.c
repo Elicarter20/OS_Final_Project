@@ -9,3 +9,6 @@ int main()
 	
          return 0;
 }
+
+//Does hello world syscall at 317
+//Other syscalls are being added
