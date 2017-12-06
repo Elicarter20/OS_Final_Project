@@ -8,9 +8,21 @@
 
 
 
- asmlinkage long cs401_set_attribute(char *filename, char *attrname, char *attrvalue, int size)
+asmlinkage long cs401_set_attribute(char *filename, char  *attrname, char *attrvalue, int size)
 {
+	
+	char* new_dir = "." + filename + "_attr" + NULL;//creates name of new directory
+	
 
+	if (true)
+	{
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+	
 }
 /*This call sets the attribute named “attrname” to the value in “attrvalue” which has length “size” to the file named “filename”. 
 
