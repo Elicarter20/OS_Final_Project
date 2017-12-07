@@ -43,7 +43,7 @@ asmlinkage long cs401_get_attribute_names(char *filename, char *buf, int bufsize
 /*This call gets all of the names of attributes that are set for the file “filename”. The list of attributes is returned as a “:” (colon) separated list in the “buf” string. The buf pointer  must have at least “bufsize” bytes of storage. The filename must be an absolute path to  the file. The strings should be null terminated, and reasonable limits should be e
 */
 
-long cs401_remove_attribute(char *filename, char *attrname)
+asmlinkage long cs401_remove_attribute(char *filename, char *attrname)
 {
 
 }
