@@ -2,13 +2,15 @@
 #include <stdlib.h>
 #include <linux/kernel.h>
 #include <sys/syscall.h>
+
+#include <errno.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <err.h>
 #include <fts.h>
-
+#include <dirent.h>
 long cs401_set_attribute(char *filename, char  *attrname, char *attrvalue, int size)
 {
 
@@ -126,55 +128,91 @@ long cs401_get_attribute_names(char *filename, char *buf, int bufsize)
 	strcat(attr_dir, "/");
 	//creates filepath to read from
 
-
-	FTS *ftsp;
-	FTSENT *p  = malloc(sizeof(FTSENT));
-	FTSENT *chp = malloc(sizeof(FTSENT));
-	int fts_options = FTS_COMFOLLOW | FTS_LOGICAL | FTS_NOCHDIR;
-	int rval= 0;
-
-	chp = fts_children(ftsp, 0);
-	if (chp == NULL)	
+	DIR *dir;
+	struct dirent *ent;
+	if((dir = opendir(attr_dir)) != NULL)
 	{
-		return -1;//no files
-	}
-
-	/*while((p = fts_read(ftsp)) != NULL)
-	{
-		switch(p->fts_info)
-		{
-			case FTS_D:
-				printf("d %s\n", p->fts_path);
-				break;	
-			case FTS_F:
-				printf("f %s\n", p->fts_path);
-				break;
-			default:
-				break;
+		while((ent = readdir (dir)) != NULL)
+		{	
+			if(ent->d_name == "..")
+				printf("F");
+			if (ent->d_name == ".")
+				continue;
+			strcat(buf, ent->d_name);
+			strcat(buf, ":");
+			printf("%s\n", buf);
 		}
-	}*/
-	fts_close(ftsp);
-	return sizeof(buf);
-
-
-	/*while(attr_dir[sizeof(attr_dir)-1] != "/")
+		closedir(dir);
+		return sizeof(buf);
+	}
+	else
 	{
-
-		strcat(buf, ":");//strcat
-		printf("%s\n", buf);
-		strcat(attr_dir,  "/");
-	}*/
-
+		/*could not open directory*/
+		perror("attr dir does not exist");
+		return -1;
+	}
+	//traverses directory and builds buf with colon seperated files
 	
 	
 	
 }
 /* gets all of the names of attributes that are set for the file “filename”. The list of attributes is returned as a “:” (colon) separated list in the “buf” string. The buf pointer  must have at least “bufsize” bytes of storage. The filename must be an absolute path to  the file. The strings should be null terminated, and reasonable limits should be e
 */
-
 long cs401_remove_attribute(char *filename, char *attrname)
 {
-
+	if (filename[0] != '/')
+	{
+		printf("Not absolute\n");
+		return -1;
+	}
+	//checks if absolute path to file
+	
+	char* attr_dir  = (char*) malloc(sizeof(filename) + 100);
+	char* attr_file = (char*) malloc(sizeof(filename)+100);
+	
+	strcpy(attr_dir, filename);	
+	strcat(attr_dir, "_attr\0");//null terminated
+	strcat(attr_dir, "/");
+	strcpy(attr_file, attr_dir);
+	strcat(attr_file, attrname);
+	//creates filepaths to read from
+	
+	FILE* file = fopen(attr_file, "r");
+	DIR * dir;
+	struct dirent *ent;
+	int n = 0;
+	if (file != NULL)//checks if file exists
+	{
+		printf("\n Removing: %s\n", attr_file);
+		remove(attr_file);
+		if((dir = opendir(attr_dir)) != NULL)
+		{
+			while((ent=readdir(dir)) != NULL)
+			{
+				if(++n> 2)
+				{
+					break;
+				}
+			}
+			closedir(dir);
+			if(n<=2)
+			{
+				printf("\n Removing empty attr dir\n");
+				rmdir(attr_dir);
+			}
+			return 0;
+		}
+	}
+	else if (ENOENT == errno)
+	{
+		printf("\n File/Directory doesnt exist\n");
+		return -1;
+	}
+	//something else went wrong
+	return -1;
+	
+	//remove file
+	//if dir is empty remove 	
 }
 
 /*This call removes the specified attribute from the file. It should remove the file that was created in the attribute directory. If this was the last user attribute for this file the attribute directory should also be removed. Note, this will require some locks as some other process may be adding a new attribute at the same time, and should not fail because the directory was removed from under it. The return value should be 0 for success, or a negative error value. This system call can be used with the cs401_get_attribute_names() call to remove ‘all’ of the attributes attached to a specific file.
@@ -191,11 +229,14 @@ int main()
 	char* ret = "";
          long int amma = syscall(317);
          printf("System call sys_hello returned %ld\n", amma);
-	//long i = cs401_set_attribute(file, "Date", "December", sizeof(file));
+	//long i = cs401_set_attribute(file, "Date", "Dog", sizeof(file));
 	//long k = cs401_set_attribute(file, "Maker", "Me", sizeof(file));
 	//long ki =  cs401_get_attribute(file, "Creator", ret, 100);    
 	//long ik =  cs401_get_attribute(file, "Maker", ret, 100);     
-	long joke = cs401_get_attribute_names(file, ret, 100);
+	//long joke = cs401_get_attribute_names(file, ret, 100);
+	//long ikea = cs401_remove_attribute(file, "Maker");
+	//long ike = cs401_remove_attribute(file, "Date");
+//	long ik = cs401_remove_attribute(file, "Boss");
 	//printf("%d\n", ki);
 	return 0;
 }
