@@ -220,15 +220,22 @@ long cs401_remove_attribute(char *filename, char *attrname)
 
 
 
-
-int main()
+int hello(char* aint)
+{
+	return 2;
+}
+int main()//char* argv[])
 {
 	char* file = "/home/oscreader/Desktop/FileAttributes/OS_Final_Project/userspace.c";
 	char * a = "Creator";
 	char * b = "Bloom";
 	char* ret = "";
-         long int amma = syscall(317);
+
+
+         long int amma = syscall(3111);
          printf("System call sys_hello returned %ld\n", amma);
+	long int ammo = syscall(356);
+         printf("System call 356 returned %ld\n", ammo);
 	//long i = cs401_set_attribute(file, "Date", "Dog", sizeof(file));
 	//long k = cs401_set_attribute(file, "Maker", "Me", sizeof(file));
 	//long ki =  cs401_get_attribute(file, "Creator", ret, 100);    
