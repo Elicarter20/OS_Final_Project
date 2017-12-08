@@ -232,9 +232,9 @@ int main()//char* argv[])
 	char* ret = "";
 
 
-         long int amma = syscall(3111);
+      //   long int amma = syscall(3111);
          printf("System call sys_hello returned %ld\n", amma);
-	long int ammo = syscall(356);
+	// long int ammo = syscall(356);
          printf("System call 356 returned %ld\n", ammo);
 	//long i = cs401_set_attribute(file, "Date", "Dog", sizeof(file));
 	//long k = cs401_set_attribute(file, "Maker", "Me", sizeof(file));
